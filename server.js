@@ -12,7 +12,7 @@ app.get("/getme", (req, res) => {
 });
 
 app.post("/postme", (req, res) => {
-  res.send({});
+  res.status(200).send(req.body);
 });
 
 app.get("/fuckup/saw-it-coming", (req, res, next) => {
