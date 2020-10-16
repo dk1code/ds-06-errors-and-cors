@@ -1,7 +1,9 @@
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
+const cors = require("cors");
 
+app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 
@@ -17,16 +19,26 @@ app.get("/fuckup/saw-it-coming", (req, res, next) => {
   try {
     test;
   } catch (err) {
-    next(err)
+    next(err);
   }
 });
 
 app.get("/fuckup/surprise", (req, res) => {
-  throw new Error("Error thrown")
+  throw new Error("Error thrown");
 });
 
-app.use((req, res) => {
-  res.status(404).json({ error: `Route ${req.url} does not exist` });
+app.use((req, res, next) => {
+  let error = new Error(`Route ${req.url} does not exist`);
+  error.status = 404;
+  next(error);
+});
+
+app.use((error, req, res, next) => {
+  res.status(error.status || 500).json({
+    error: {
+      message: error.message,
+    },
+  });
 });
 
 app.listen(5000, () => {
